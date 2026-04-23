@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="AI-powered salon marketing automation platform for email and SMS campaigns" />
+    <meta name="theme-color" content="#7F77DD" />
+    <title>Brows and Lashes - Salon Automation Hub</title>
+    <style>
+        :root {
+            --color-background-primary: #ffffff;
+            --color-background-secondary: #f6f6f6;
+            --color-background-success: #ecf5f0;
+            --color-background-danger: #fce8e6;
+            --color-text-primary: #1f2937;
+            --color-text-secondary: #6b7280;
+            --color-text-success: #1d9e75;
+            --color-text-danger: #d32f2f;
+            --color-border-tertiary: #e5e7eb;
+            --color-border-secondary: #d1d5db;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 0.75rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background: var(--color-background-primary);
+            color: var(--color-text-primary);
+            line-height: 1.5;
+        }
+
+        #root {
+            min-height: 100vh;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>
