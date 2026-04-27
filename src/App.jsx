@@ -1,5 +1,5 @@
-import SalonAutomationHub from '@components/SalonAutomationHub'
+import AdminDashboard from '@components/AdminDashboard'
 
 export default function App() {
-  return <SalonAutomationHub />
+  return <AdminDashboard />
 }

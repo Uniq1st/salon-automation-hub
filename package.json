@@ -1,7 +1,7 @@
 {
   "name": "salon-automation-hub",
   "version": "1.0.0",
-  "description": "AI-powered salon marketing automation platform integrating Gmail, Square, and Google Gemini AI",
+  "description": "AI-powered salon marketing automation + social media engine. Claude AI, image/video generation, Instagram/TikTok posting, SMS/Email campaigns, revenue automation",
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
@@ -22,7 +22,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "axios": "^1.6.0",
-    "@google/generative-ai": "^0.11.0"
+    "@anthropic-ai/sdk": "^0.24.0",
+    "openai": "^4.52.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.0",
