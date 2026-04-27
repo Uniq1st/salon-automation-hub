@@ -15,14 +15,26 @@ function getLocationId() {
   return process.env.SQUARE_LOCATION_ID;
 }
 
-// Get all customers from Square
+// Get all customers from Square (paginates through all pages)
 export async function getAllCustomers() {
   try {
-    const response = await getSquareClient().get('/customers');
+    const allCustomers = [];
+    let cursor = null;
+
+    do {
+      const params = { limit: 100 };
+      if (cursor) params.cursor = cursor;
+
+      const response = await getSquareClient().get('/customers', { params });
+      const page = response.data.customers || [];
+      allCustomers.push(...page);
+      cursor = response.data.cursor || null;
+    } while (cursor);
+
     return {
       success: true,
-      customers: response.data.customers || [],
-      count: response.data.customers?.length || 0,
+      customers: allCustomers,
+      count: allCustomers.length,
     };
   } catch (error) {
     console.error('Square get customers error:', error);
