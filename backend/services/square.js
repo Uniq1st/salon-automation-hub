@@ -1,23 +1,24 @@
 import axios from 'axios';
 
-const SQUARE_API_URL = process.env.SQUARE_API_URL || 'https://connect.squareupsandbox.com';
-const SQUARE_ACCESS_TOKEN = process.env.SQUARE_ACCESS_TOKEN;
-const SQUARE_LOCATION_ID = process.env.SQUARE_LOCATION_ID;
+function getSquareClient() {
+  return axios.create({
+    baseURL: `${process.env.SQUARE_API_URL || 'https://connect.squareup.com'}/v2`,
+    headers: {
+      'Square-Version': '2024-04-17',
+      'Authorization': `Bearer ${process.env.SQUARE_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+  });
+}
 
-// Initialize Square API client
-const squareClient = axios.create({
-  baseURL: `${SQUARE_API_URL}/v2`,
-  headers: {
-    'Square-Version': '2024-04-17',
-    'Authorization': `Bearer ${SQUARE_ACCESS_TOKEN}`,
-    'Content-Type': 'application/json',
-  },
-});
+function getLocationId() {
+  return process.env.SQUARE_LOCATION_ID;
+}
 
 // Get all customers from Square
 export async function getAllCustomers() {
   try {
-    const response = await squareClient.get('/customers');
+    const response = await getSquareClient().get('/customers');
     return {
       success: true,
       customers: response.data.customers || [],
@@ -32,7 +33,7 @@ export async function getAllCustomers() {
 // Get single customer
 export async function getCustomer(customerId) {
   try {
-    const response = await squareClient.get(`/customers/${customerId}`);
+    const response = await getSquareClient().get(`/customers/${customerId}`);
     return {
       success: true,
       customer: response.data.customer,
@@ -46,7 +47,7 @@ export async function getCustomer(customerId) {
 // Create customer
 export async function createCustomer(customerData) {
   try {
-    const response = await squareClient.post('/customers', {
+    const response = await getSquareClient().post('/customers', {
       given_name: customerData.firstName,
       family_name: customerData.lastName,
       email_address: customerData.email,
@@ -67,7 +68,7 @@ export async function createCustomer(customerData) {
 // Update customer
 export async function updateCustomer(customerId, customerData) {
   try {
-    const response = await squareClient.put(`/customers/${customerId}`, {
+    const response = await getSquareClient().put(`/customers/${customerId}`, {
       given_name: customerData.firstName,
       family_name: customerData.lastName,
       email_address: customerData.email,
@@ -88,7 +89,7 @@ export async function updateCustomer(customerId, customerData) {
 // Get customer bookings (appointments)
 export async function getCustomerBookings(customerId) {
   try {
-    const response = await squareClient.get('/bookings', {
+    const response = await getSquareClient().get('/bookings', {
       params: {
         customer_id: customerId,
       },
@@ -108,9 +109,9 @@ export async function getCustomerBookings(customerId) {
 // Get all bookings for location
 export async function getAllBookings(startDate, endDate) {
   try {
-    const response = await squareClient.get('/bookings', {
+    const response = await getSquareClient().get('/bookings', {
       params: {
-        location_id: SQUARE_LOCATION_ID,
+        location_id: getLocationId(),
         start_at_min: startDate,
         start_at_max: endDate,
       },
@@ -177,7 +178,7 @@ export async function sendEmail(customerId, subject, body) {
 // Get customer payment history
 export async function getCustomerPayments(customerId) {
   try {
-    const response = await squareClient.get('/payments', {
+    const response = await getSquareClient().get('/payments', {
       params: {
         customer_id: customerId,
       },
@@ -197,9 +198,9 @@ export async function getCustomerPayments(customerId) {
 // Get invoice data
 export async function getInvoices() {
   try {
-    const response = await squareClient.get('/invoices', {
+    const response = await getSquareClient().get('/invoices', {
       params: {
-        location_id: SQUARE_LOCATION_ID,
+        location_id: getLocationId(),
       },
     });
 
@@ -217,7 +218,7 @@ export async function getInvoices() {
 // Get catalog (services/products)
 export async function getCatalog() {
   try {
-    const response = await squareClient.get('/catalog/list');
+    const response = await getSquareClient().get('/catalog/list');
 
     return {
       success: true,
@@ -234,7 +235,7 @@ export async function getCatalog() {
 export async function getSalesData(startDate, endDate) {
   try {
     const bookings = await getAllBookings(startDate, endDate);
-    const payments = await squareClient.get('/payments', {
+    const payments = await getSquareClient().get('/payments', {
       params: {
         begin_time: startDate,
         end_time: endDate,
