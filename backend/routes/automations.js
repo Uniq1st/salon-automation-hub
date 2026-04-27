@@ -1,11 +1,22 @@
 import express from 'express';
-import { sendGmailDraft, sendSquareSMS } from '../services/communications.js';
+import { sendCampaign, verifyEmailConnection } from '../services/email.js';
+import { getAllCustomers } from '../services/square.js';
 
 const router = express.Router();
 
+// Verify email connection is working
+router.get('/verify-email', async (req, res) => {
+  try {
+    const result = await verifyEmailConnection();
+    res.json({ success: true, ...result });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 router.post('/send', async (req, res, next) => {
   try {
-    const { automationId, template, clientCount } = req.body;
+    const { automationId, template, promoOffer, promoDates } = req.body;
 
     if (!automationId || !template) {
       return res.status(400).json({
@@ -14,20 +25,40 @@ router.post('/send', async (req, res, next) => {
       });
     }
 
-    // Send via Gmail (email)
-    const gmailResult = await sendGmailDraft(template, clientCount);
+    if (!template.subject || !template.email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Template must have subject and email fields',
+      });
+    }
 
-    // Send via Square (SMS)
-    const squareResult = await sendSquareSMS(template, clientCount);
+    // Fetch all customers with email addresses
+    const { customers } = await getAllCustomers();
+    const emailableCustomers = customers
+      .filter(c => c.email_address)
+      .map(c => ({ ...c, promoOffer, promoDates }));
+
+    if (emailableCustomers.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No customers with email addresses found',
+      });
+    }
+
+    // Send campaign
+    const results = await sendCampaign({
+      customers: emailableCustomers,
+      subject: template.subject,
+      body: template.email,
+    });
 
     res.json({
       success: true,
       automationId,
-      results: {
-        email: gmailResult,
-        sms: squareResult,
-      },
-      message: `✓ "${automationId}" automation queued! Email drafted in Gmail + SMS queued via Square for ${clientCount} clients.`,
+      sent: results.sent.length,
+      failed: results.failed.length,
+      failedList: results.failed,
+      message: `✓ Sent to ${results.sent.length} clients${results.failed.length > 0 ? `, ${results.failed.length} failed` : ''}`,
     });
   } catch (error) {
     next(error);

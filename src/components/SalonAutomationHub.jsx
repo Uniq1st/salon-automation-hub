@@ -69,18 +69,19 @@ export default function SalonAutomationHub() {
         body: JSON.stringify({
           automationId,
           template,
-          clientCount: stats.reachable
+          promoOffer: promoOffer === "Custom offer..." ? customPromo : promoOffer,
+          promoDates,
         })
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         setResults(prev => ({
           ...prev,
           [automationId]: {
             success: true,
-            message: `✓ "${automation.label}" automation queued! Email drafted in Gmail + SMS queued via Square for ${stats.reachable} clients.`,
+            message: data.message || `✓ "${automation.label}" sent!`,
           },
         }));
       } else {
