@@ -1,7 +1,7 @@
 {
   "name": "salon-automation-hub",
   "version": "1.0.0",
-  "description": "AI-powered salon marketing automation platform integrating Gmail, Square, and Claude AI",
+  "description": "AI-powered salon marketing automation platform integrating Gmail, Square, and Google Gemini AI",
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
@@ -21,7 +21,8 @@
     "express": "^4.18.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "axios": "^1.6.0"
+    "axios": "^1.6.0",
+    "@google/generative-ai": "^0.11.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.0",

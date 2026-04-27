@@ -1,26 +1,13 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
 export async function generateAIMessage(prompt) {
   try {
-    const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        }
-      ],
-    });
-
-    const text = message.content
-      .map(block => block.text || '')
-      .join('');
-
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    
     // Clean JSON response
     const clean = text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
