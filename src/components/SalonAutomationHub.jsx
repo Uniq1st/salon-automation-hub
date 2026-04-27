@@ -5,11 +5,11 @@ import Spinner from "./Spinner";
 import { AUTOMATIONS, defaultTemplates, promoOptions } from "@utils/constants";
 import { useAIGeneration } from "@hooks/useAIGeneration";
 
-const SALON_NAME = process.env.VITE_SALON_NAME || "Brows and Lashes";
-const SALON_EMAIL = process.env.VITE_SALON_EMAIL || "browsandlashesbyuniqswek@gmail.com";
-const SALON_PHONE = process.env.VITE_SALON_PHONE || "+1 917-388-2434";
-const SALON_ADDRESS = process.env.VITE_SALON_ADDRESS || "1240 Lexington Ave, New York, NY 10028";
-const BOOKING_URL = process.env.VITE_BOOKING_URL || "https://book.squareup.com/appointments/4t8q4a3w43qqpa/location/LJDRXPJBMD5Y2/services";
+const SALON_NAME = import.meta.env.VITE_SALON_NAME || "Brows and Lashes";
+const SALON_EMAIL = import.meta.env.VITE_SALON_EMAIL || "browsandlashesbyuniqswek@gmail.com";
+const SALON_PHONE = import.meta.env.VITE_SALON_PHONE || "+1 917-388-2434";
+const SALON_ADDRESS = import.meta.env.VITE_SALON_ADDRESS || "1240 Lexington Ave, New York, NY 10028";
+const BOOKING_URL = import.meta.env.VITE_BOOKING_URL || "https://book.squareup.com/appointments/4t8q4a3w43qqpa/location/LJDRXPJBMD5Y2/services";
 
 export default function SalonAutomationHub() {
   const [activeModal, setActiveModal] = useState(null);

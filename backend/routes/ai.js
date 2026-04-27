@@ -14,7 +14,18 @@ router.post('/generate', async (req, res, next) => {
       });
     }
 
-    const template = await generateAIMessage(prompt);
+    const result = await generateAIMessage(prompt);
+
+    let template;
+    try {
+      template = JSON.parse(result.content);
+    } catch {
+      template = {
+        subject: 'Message from Brows and Lashes',
+        email: result.content,
+        sms: result.content.substring(0, 160),
+      };
+    }
 
     res.json({
       success: true,

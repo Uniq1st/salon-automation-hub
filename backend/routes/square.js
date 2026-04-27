@@ -29,6 +29,17 @@ router.get('/customers', async (req, res) => {
   }
 });
 
+// Inactive customers — must be before /customers/:customerId
+router.get('/customers/inactive', async (req, res) => {
+  try {
+    const { daysInactive = 60 } = req.query;
+    const result = await getInactiveCustomers(parseInt(daysInactive));
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 router.get('/customers/:customerId', async (req, res) => {
   try {
     const result = await getCustomer(req.params.customerId);
@@ -156,17 +167,6 @@ router.post('/customers/:customerId/tags', async (req, res) => {
   try {
     const { tag } = req.body;
     const result = await tagCustomer(req.params.customerId, tag);
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// Inactive customers
-router.get('/customers/inactive', async (req, res) => {
-  try {
-    const { daysInactive = 60 } = req.query;
-    const result = await getInactiveCustomers(parseInt(daysInactive));
     res.json(result);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
