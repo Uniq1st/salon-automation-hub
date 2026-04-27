@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { generateInstagramCaption, generateUpsellContent } from '@/utils/api';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('customers');
