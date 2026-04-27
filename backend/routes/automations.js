@@ -14,6 +14,18 @@ router.get('/verify-email', async (req, res) => {
   }
 });
 
+// Send a test email to one address only — safe to call anytime
+router.post('/test-email', async (req, res) => {
+  try {
+    const { to = process.env.GMAIL_USER, subject, body } = req.body;
+    const { sendEmail } = await import('../services/email.js');
+    await sendEmail({ to, subject: subject || 'Test email from Salon Hub', body: body || 'Email sending is working!' });
+    res.json({ success: true, message: `Test email sent to ${to}` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 router.post('/send', async (req, res, next) => {
   try {
     const { automationId, template, promoOffer, promoDates } = req.body;

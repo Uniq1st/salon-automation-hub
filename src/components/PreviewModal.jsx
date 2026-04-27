@@ -1,8 +1,9 @@
 import { useState } from "react";
 import Spinner from "./Spinner";
 
-function PreviewModal({ automation, template, onClose, onSend, sending, result }) {
+function PreviewModal({ automation, template, onClose, onSend, sending, result, clientCount }) {
   const [tab, setTab] = useState("email");
+  const [testMode, setTestMode] = useState(true);
 
   return (
     <div style={{
@@ -18,6 +19,7 @@ function PreviewModal({ automation, template, onClose, onSend, sending, result }
         maxHeight: "80vh", overflowY: "auto",
         padding: "1.5rem",
       }}>
+        {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
           <div>
             <p style={{ margin: 0, fontWeight: 500, fontSize: 16 }}>{automation.label}</p>
@@ -29,6 +31,42 @@ function PreviewModal({ automation, template, onClose, onSend, sending, result }
           }}>×</button>
         </div>
 
+        {/* Test mode toggle */}
+        <div style={{
+          background: testMode ? "#FFF8E7" : "#FEF0EE",
+          border: `1px solid ${testMode ? "#F5C842" : "#D85A30"}`,
+          borderRadius: "var(--border-radius-md)",
+          padding: "10px 14px",
+          marginBottom: "1rem",
+          display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+        }}>
+          <div>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 500, color: testMode ? "#92660A" : "#D85A30" }}>
+              {testMode ? "Test mode — sends only to you" : `Live mode — sends to ${clientCount} real clients`}
+            </p>
+            <p style={{ margin: "2px 0 0", fontSize: 12, color: "var(--color-text-secondary)" }}>
+              {testMode
+                ? "Safe to click. Toggle off when ready for the real campaign."
+                : "This will email all your clients. Make sure the message looks right first."}
+            </p>
+          </div>
+          <button
+            onClick={() => setTestMode(t => !t)}
+            style={{
+              flexShrink: 0,
+              padding: "6px 12px",
+              borderRadius: "var(--border-radius-md)",
+              border: `1px solid ${testMode ? "#F5C842" : "#D85A30"}`,
+              background: testMode ? "#F5C842" : "#D85A30",
+              color: testMode ? "#92660A" : "#fff",
+              cursor: "pointer", fontSize: 12, fontWeight: 600,
+            }}
+          >
+            {testMode ? "Switch to Live" : "Back to Test"}
+          </button>
+        </div>
+
+        {/* Email / SMS tabs */}
         <div style={{ display: "flex", gap: 8, marginBottom: "1rem" }}>
           {["email", "sms"].map(t => (
             <button key={t} onClick={() => setTab(t)} style={{
@@ -96,15 +134,19 @@ function PreviewModal({ automation, template, onClose, onSend, sending, result }
             background: "transparent", cursor: "pointer", fontSize: 14,
             color: "var(--color-text-secondary)",
           }}>Cancel</button>
-          <button onClick={onSend} disabled={sending} style={{
+          <button onClick={() => onSend(testMode)} disabled={sending} style={{
             padding: "8px 16px", borderRadius: "var(--border-radius-md)",
-            border: "none", background: automation.color, color: "#fff",
+            border: "none",
+            background: testMode ? "#F5C842" : automation.color,
+            color: testMode ? "#92660A" : "#fff",
             cursor: sending ? "not-allowed" : "pointer", fontSize: 14,
             fontWeight: 500, opacity: sending ? 0.7 : 1,
             display: "flex", alignItems: "center", gap: 4,
           }}>
             {sending && <Spinner />}
-            {sending ? "Generating..." : "Generate & Queue"}
+            {sending
+              ? (testMode ? "Sending test..." : "Sending to clients...")
+              : (testMode ? "Send Test to Me" : `Send to ${clientCount} Clients`)}
           </button>
         </div>
       </div>

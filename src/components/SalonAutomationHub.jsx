@@ -56,22 +56,26 @@ export default function SalonAutomationHub() {
     }
   };
 
-  const handleSend = async (automationId) => {
+  const handleSend = async (automationId, testMode = true) => {
     setSending(true);
     try {
       const template = templates[automationId] || defaultTemplates[automationId];
       const automation = AUTOMATIONS.find(a => a.id === automationId);
 
-      // Call backend API
-      const response = await fetch("/api/automations/send", {
+      const endpoint = testMode ? "/api/automations/test-email" : "/api/automations/send";
+      const body = testMode
+        ? { subject: template.subject, body: template.email }
+        : {
+            automationId,
+            template,
+            promoOffer: promoOffer === "Custom offer..." ? customPromo : promoOffer,
+            promoDates,
+          };
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          automationId,
-          template,
-          promoOffer: promoOffer === "Custom offer..." ? customPromo : promoOffer,
-          promoDates,
-        })
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();
@@ -257,9 +261,10 @@ export default function SalonAutomationHub() {
             ? defaultTemplates[activeModal]
             : (templates[activeModal] || defaultTemplates[activeModal])}
           onClose={() => setActiveModal(null)}
-          onSend={() => handleSend(activeModal)}
+          onSend={(testMode) => handleSend(activeModal, testMode)}
           sending={sending}
           result={results[activeModal]}
+          clientCount={stats.reachable}
         />
       )}
     </>
