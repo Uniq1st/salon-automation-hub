@@ -21,7 +21,22 @@ export default function SalonAutomationHub() {
   const [customPromo, setCustomPromo] = useState("");
   const [generatedMessages, setGeneratedMessages] = useState({});
   const [aiLoading, setAiLoading] = useState({});
-  const [stats] = useState({ customers: 198, reachable: 198 });
+  const [stats, setStats] = useState({ customers: 0, reachable: 0 });
+
+  useEffect(() => {
+    fetch("/api/square/customers")
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          const total = data.count || 0;
+          const reachable = data.customers.filter(
+            c => c.email_address || c.phone_number
+          ).length;
+          setStats({ customers: total, reachable });
+        }
+      })
+      .catch(() => setStats({ customers: 198, reachable: 198 }));
+  }, []);
 
   const { generateWithAI } = useAIGeneration({
     salonInfo: { SALON_NAME, SALON_EMAIL, SALON_PHONE, SALON_ADDRESS, BOOKING_URL },
