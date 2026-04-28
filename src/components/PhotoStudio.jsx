@@ -2,12 +2,23 @@ import { useState, useEffect, useRef } from 'react';
 
 const API = 'http://localhost:3001';
 
+async function postToSocial({ platform, photoId, filename, caption, hashtags, isGenerated }) {
+  const res = await fetch(`${API}/api/social/${platform}/post`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ photoId, filename, caption, hashtags, isGenerated }),
+  });
+  return res.json();
+}
+
 export default function PhotoStudio() {
   const [photos, setPhotos] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [selected, setSelected] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [posting, setPosting] = useState(null);
+  const [postResult, setPostResult] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef();
 
@@ -42,6 +53,22 @@ export default function PhotoStudio() {
       setSelected(data.photo);
     }
     setAnalyzing(false);
+  }
+
+  async function handlePost(platform, photo, genFilename = null) {
+    setPosting(platform + (genFilename || ''));
+    setPostResult(null);
+    const result = await postToSocial({
+      platform,
+      photoId: photo.id,
+      filename: genFilename || photo.filename,
+      caption: photo.aiAnalysis?.caption || '',
+      hashtags: photo.aiAnalysis?.hashtags || [],
+      isGenerated: !!genFilename,
+    });
+    setPostResult(result);
+    setPosting(null);
+    if (result.success) fetchPhotos();
   }
 
   async function handleGenerate(photo) {
@@ -210,6 +237,45 @@ export default function PhotoStudio() {
                   <p style={{ margin: '0 0 4px', fontSize: 11, color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>TikTok hook</p>
                   <p style={{ margin: 0, fontSize: 14, fontStyle: 'italic' }}>"{selected.aiAnalysis.tiktokHook}"</p>
                 </div>
+
+                {/* Post buttons for original photo */}
+                <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                  <button
+                    onClick={() => handlePost('instagram', selected)}
+                    disabled={!!posting}
+                    style={{
+                      flex: 1, padding: '10px 0', borderRadius: 8, border: 'none',
+                      background: 'linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)',
+                      color: '#fff', fontWeight: 600, fontSize: 13,
+                      cursor: posting ? 'not-allowed' : 'pointer', opacity: posting ? 0.7 : 1,
+                    }}
+                  >
+                    {posting === 'instagram' ? 'Posting...' : '📸 Post to Instagram'}
+                  </button>
+                  <button
+                    onClick={() => handlePost('tiktok', selected)}
+                    disabled={!!posting}
+                    style={{
+                      flex: 1, padding: '10px 0', borderRadius: 8, border: 'none',
+                      background: '#010101', color: '#fff', fontWeight: 600, fontSize: 13,
+                      cursor: posting ? 'not-allowed' : 'pointer', opacity: posting ? 0.7 : 1,
+                    }}
+                  >
+                    {posting === 'tiktok' ? 'Posting...' : '🎵 Post to TikTok'}
+                  </button>
+                </div>
+
+                {postResult && (
+                  <div style={{
+                    marginTop: 10, padding: '10px 14px', borderRadius: 8,
+                    background: postResult.success ? '#E1F5EE' : '#FEF0EE',
+                    color: postResult.success ? '#1D9E75' : '#D85A30', fontSize: 13,
+                  }}>
+                    {postResult.success
+                      ? `✓ Posted! View at ${postResult.url}`
+                      : `Error: ${postResult.error}`}
+                  </div>
+                )}
               </div>
             )}
 
@@ -223,15 +289,20 @@ export default function PhotoStudio() {
                       <img src={genUrl(g.filename)} alt={`Generated ${i + 1}`}
                         style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
                       <div style={{ padding: '8px 10px', background: '#fafafa' }}>
-                        <p style={{ margin: 0, fontSize: 11, color: '#6b7280' }}>
-                          {new Date(g.createdAt).toLocaleDateString()}
+                        <p style={{ margin: '0 0 4px', fontSize: 11, color: '#6b7280' }}>
+                          Generated {new Date(g.createdAt).toLocaleDateString()}
                         </p>
-                        <button style={{
-                          marginTop: 4, width: '100%', padding: '5px 0',
-                          background: '#7F77DD', color: '#fff', border: 'none',
-                          borderRadius: 5, fontSize: 11, cursor: 'pointer', fontWeight: 500,
-                        }}>
-                          Post to Instagram
+                        <button
+                          onClick={() => handlePost('instagram', selected, g.filename)}
+                          disabled={!!posting}
+                          style={{
+                            width: '100%', padding: '6px 0', border: 'none',
+                            background: 'linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)',
+                            color: '#fff', borderRadius: 5, fontSize: 11,
+                            cursor: posting ? 'not-allowed' : 'pointer', fontWeight: 600,
+                          }}
+                        >
+                          {posting === ('instagram' + g.filename) ? 'Posting...' : '📸 Instagram'}
                         </button>
                       </div>
                     </div>
