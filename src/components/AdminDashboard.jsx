@@ -13,7 +13,7 @@ export default function AdminDashboard() {
   const fetchCustomers = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/square/customers`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/square/customers`);
       const data = await response.json();
       setCustomers(data.customers || []);
     } catch (error) {
@@ -28,7 +28,7 @@ export default function AdminDashboard() {
     try {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - 30);
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/square/bookings?startDate=${startDate.toISOString()}&endDate=${new Date().toISOString()}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/square/bookings?startDate=${startDate.toISOString()}&endDate=${new Date().toISOString()}`);
       const data = await response.json();
       setBookings(data.bookings || []);
     } catch (error) {
@@ -43,7 +43,7 @@ export default function AdminDashboard() {
     try {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - 30);
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/square/sales?startDate=${startDate.toISOString()}&endDate=${new Date().toISOString()}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/square/sales?startDate=${startDate.toISOString()}&endDate=${new Date().toISOString()}`);
       const data = await response.json();
       setSalesData(data);
     } catch (error) {
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
   // Generate upsell content for customer
   const handleGenerateUpsell = async (customer) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/content/generate/upsell`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/content/generate/upsell`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
