@@ -6,6 +6,7 @@ import automationRoutes from './routes/automations.js';
 import healthRoutes from './routes/health.js';
 import contentRoutes from './routes/content.js';
 import squareRoutes from './routes/square.js';
+import photoRoutes from './routes/photos.js';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/automations', automationRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/square', squareRoutes);
+app.use('/api/photos', photoRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
