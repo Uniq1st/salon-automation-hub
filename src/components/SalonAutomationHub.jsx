@@ -62,9 +62,9 @@ export default function SalonAutomationHub() {
       const template = templates[automationId] || defaultTemplates[automationId];
       const automation = AUTOMATIONS.find(a => a.id === automationId);
 
-      const endpoint = testMode ? "/api/automations/test-email" : "/api/automations/send";
+      const endpoint = testMode ? "/api/automations/test-both" : "/api/automations/send";
       const body = testMode
-        ? { subject: template.subject, body: template.email }
+        ? { subject: template.subject, emailBody: template.email, smsBody: template.sms }
         : {
             automationId,
             template,
